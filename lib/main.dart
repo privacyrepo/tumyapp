@@ -4,11 +4,16 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:tumy_app/screens/SplashScreen.dart';
 import 'package:tumy_app/store/AppStore.dart';
 import 'package:tumy_app/utils/AppTheme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 AppStore appStore = AppStore();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await initialize();
   appStore.toggleDarkMode(value: false);
 

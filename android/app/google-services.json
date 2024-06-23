@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1085125185652",
+    "firebase_url": "https://tumy-app-default-rtdb.firebaseio.com",
+    "project_id": "tumy-app",
+    "storage_bucket": "tumy-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085125185652:android:c864d4afebb6fb9dd78121",
+        "android_client_info": {
+          "package_name": "com.tumy.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAefgGSd8Hvczu-S6HU20_WGp-YDo0_nCs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

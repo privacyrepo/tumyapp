@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:tumy_app/screens/auth/components/LoginInComponent.dart';
 import 'package:tumy_app/screens/auth/components/SignUpComponent.dart';
 import 'package:tumy_app/utils/Common.dart';
@@ -15,7 +16,6 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  bool doRemember = false;
   int selectedIndex = 0;
 
   @override

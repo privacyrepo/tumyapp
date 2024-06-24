@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:tumy_app/screens/DashboardScreen.dart';
 import 'package:tumy_app/utils/Colors.dart';
 import 'package:tumy_app/utils/Common.dart';
+import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
 
 class SignUpComponent extends StatefulWidget {
   final VoidCallback? callback;
@@ -14,6 +16,22 @@ class SignUpComponent extends StatefulWidget {
 }
 
 class _SignUpComponentState extends State<SignUpComponent> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _signUp() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      await authProvider.signUp(
+          _emailController.text.trim(), _passwordController.text.trim());
+      DashboardScreen().launch(context);
+    } catch (e) {
+      // Handle sign-up error
+      toast('Sign up failed: ${e.toString()}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,19 +52,9 @@ class _SignUpComponentState extends State<SignUpComponent> {
             Container(
               child: Column(
                 children: [
-                  30.height,
-                  AppTextField(
-                    textFieldType: TextFieldType.NAME,
-                    textStyle: boldTextStyle(),
-                    decoration: svInputDecoration(
-                      context,
-                      label: 'Username',
-                      labelStyle: secondaryTextStyle(
-                          weight: FontWeight.w600, color: svGetBodyColor()),
-                    ),
-                  ).paddingSymmetric(horizontal: 16),
                   8.height,
                   AppTextField(
+                    controller: _emailController,
                     textFieldType: TextFieldType.EMAIL,
                     textStyle: boldTextStyle(),
                     decoration: svInputDecoration(
@@ -58,6 +66,7 @@ class _SignUpComponentState extends State<SignUpComponent> {
                   ).paddingSymmetric(horizontal: 16),
                   16.height,
                   AppTextField(
+                    controller: _passwordController,
                     textFieldType: TextFieldType.PASSWORD,
                     textStyle: boldTextStyle(),
                     suffixIconColor: svGetBodyColor(),
@@ -79,31 +88,10 @@ class _SignUpComponentState extends State<SignUpComponent> {
                     ),
                   ).paddingSymmetric(horizontal: 16),
                   10.height,
-                  AppTextField(
-                    textFieldType: TextFieldType.PHONE,
-                    decoration: svInputDecoration(
-                      context,
-                      label: 'Contact Number',
-                      prefix: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('+144', style: boldTextStyle(size: 14)),
-                          6.width,
-                          Icon(Icons.keyboard_arrow_down,
-                              size: 16, color: svGetBodyColor()),
-                        ],
-                      ),
-                      labelStyle: secondaryTextStyle(
-                          weight: FontWeight.w600, color: svGetBodyColor()),
-                    ),
-                  ).paddingSymmetric(horizontal: 16),
-                  80.height,
                   svAppButton(
                     context: context,
                     text: 'SIGN UP',
-                    onTap: () {
-                      DashboardScreen().launch(context);
-                    },
+                    onTap: _signUp,
                   ),
                   16.height,
                   Row(

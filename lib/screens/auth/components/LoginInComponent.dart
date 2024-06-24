@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:tumy_app/screens/DashboardScreen.dart';
 import 'package:tumy_app/screens/auth/screens/ForgetPasswordScreen.dart';
 import 'package:tumy_app/utils/Colors.dart';
 import 'package:tumy_app/utils/Common.dart';
+import 'package:tumy_app/screens/auth/components/AuthProvider.dart'; // Ensure you import the AuthProvider
 
 class LoginInComponent extends StatefulWidget {
   final VoidCallback? callback;
@@ -15,10 +17,14 @@ class LoginInComponent extends StatefulWidget {
 }
 
 class _LoginInComponentState extends State<LoginInComponent> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool doRemember = false;
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Container(
       width: context.width(),
       color: context.cardColor,
@@ -39,6 +45,7 @@ class _LoginInComponentState extends State<LoginInComponent> {
                 children: [
                   30.height,
                   AppTextField(
+                    controller: _emailController,
                     textFieldType: TextFieldType.EMAIL,
                     textStyle: boldTextStyle(),
                     decoration: svInputDecoration(
@@ -50,6 +57,7 @@ class _LoginInComponentState extends State<LoginInComponent> {
                   ).paddingSymmetric(horizontal: 16),
                   16.height,
                   AppTextField(
+                    controller: _passwordController,
                     textFieldType: TextFieldType.PASSWORD,
                     textStyle: boldTextStyle(),
                     suffixIconColor: svGetBodyColor(),
@@ -103,8 +111,18 @@ class _LoginInComponentState extends State<LoginInComponent> {
                   svAppButton(
                     context: context,
                     text: 'LOGIN',
-                    onTap: () {
-                      DashboardScreen().launch(context);
+                    onTap: () async {
+                      try {
+                        await authProvider.login(
+                          _emailController.text.trim(),
+                          _passwordController.text.trim(),
+                        );
+                        DashboardScreen().launch(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Login failed')),
+                        );
+                      }
                     },
                   ),
                   16.height,

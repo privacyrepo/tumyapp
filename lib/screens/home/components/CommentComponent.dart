@@ -72,14 +72,34 @@ class _CommentComponentState extends State<CommentComponent> {
                 children: [
                   Row(
                     children: [
-                      if (authorUser!.avatar.isNotEmpty) ...[
-                        Image.network(authorUser!.avatar,
-                                height: 48, width: 48, fit: BoxFit.cover)
-                            .cornerRadiusWithClipRRect(8)
-                      ] else ...[
-                        Icon(Icons.person, size: 48)
-                            .cornerRadiusWithClipRRect(8)
-                      ],
+                      if (authorUser!.avatar.isNotEmpty)
+                        Image.network(
+                          authorUser!.avatar,
+                          height: 48,
+                          width: 48,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) {
+                              return child;
+                            } else {
+                              return CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        (loadingProgress.expectedTotalBytes ??
+                                            1)
+                                    : null,
+                              );
+                            }
+                          },
+                          errorBuilder: (BuildContext context, Object error,
+                              StackTrace? stackTrace) {
+                            return Icon(Icons.error,
+                                size: 48); // Error icon or any other placeholder
+                          },
+                        ).cornerRadiusWithClipRRect(8)
+                      else
+                        Icon(Icons.person, size: 48).cornerRadiusWithClipRRect(8),
                       16.width,
                       Text(authorUser!.name.validate(),
                           style: boldTextStyle(size: 14)),
@@ -88,23 +108,21 @@ class _CommentComponentState extends State<CommentComponent> {
                           height: 14, width: 14, fit: BoxFit.cover),
                     ],
                   ),
-                  Flexible(
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          'images/tumy/icons/ic_TimeSquare.png',
-                          height: 14,
-                          width: 14,
-                          fit: BoxFit.cover,
-                          color: context.iconColor,
-                        ),
-                        4.width,
-                        Text(timeAgo(widget.comment.createdAt),
-                            style: secondaryTextStyle(
-                                color: svGetBodyColor(), size: 12)),
-                      ],
-                    ),
-                  )
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/tumy/icons/ic_TimeSquare.png',
+                        height: 14,
+                        width: 14,
+                        fit: BoxFit.cover,
+                        color: context.iconColor,
+                      ),
+                      4.width,
+                      Text(timeAgo(widget.comment.createdAt),
+                          style: secondaryTextStyle(
+                              color: svGetBodyColor(), size: 12)),
+                    ],
+                  ),
                 ],
               ),
               16.height,
@@ -112,38 +130,36 @@ class _CommentComponentState extends State<CommentComponent> {
                   style: secondaryTextStyle(color: svGetBodyColor())),
               16.height,
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _toggleLike,
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: radius(4),
-                          color: svGetScaffoldColor(),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            isLiked
-                                ? Image.asset(
-                                    'images/tumy/icons/ic_HeartFilled.png',
-                                    height: 14,
-                                    width: 14,
-                                    fit: BoxFit.fill)
-                                : Image.asset(
-                                    'images/tumy/icons/ic_Heart.png',
-                                    height: 14,
-                                    width: 14,
-                                    fit: BoxFit.cover,
-                                    color: svGetBodyColor(),
-                                  ),
-                            2.width,
-                            Text(widget.comment.likes.length.toString(),
-                                style: secondaryTextStyle(size: 12)),
-                          ],
-                        ),
+                  GestureDetector(
+                    onTap: _toggleLike,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: radius(4),
+                        color: svGetScaffoldColor(),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          isLiked
+                              ? Image.asset(
+                                  'images/tumy/icons/ic_HeartFilled.png',
+                                  height: 14,
+                                  width: 14,
+                                  fit: BoxFit.fill)
+                              : Image.asset(
+                                  'images/tumy/icons/ic_Heart.png',
+                                  height: 14,
+                                  width: 14,
+                                  fit: BoxFit.cover,
+                                  color: svGetBodyColor(),
+                                ),
+                          2.width,
+                          Text(widget.comment.likes.length.toString(),
+                              style: secondaryTextStyle(size: 12)),
+                        ],
                       ),
                     ),
                   ),
@@ -153,26 +169,16 @@ class _CommentComponentState extends State<CommentComponent> {
                       widget.onReply(widget.comment.id);
                     },
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
                         borderRadius: radius(4),
                         color: svGetScaffoldColor(),
                       ),
                       child: Text('Reply', style: secondaryTextStyle(size: 12)),
                     ),
-                  )
+                  ),
                 ],
               ),
-              if (widget.isReplying)
-                Padding(
-                  padding: EdgeInsets.only(
-                      top: 16, left: 70), // Adjust padding as needed
-                  child: CommentReplyComponent(
-                    parentId: widget.comment.id,
-                    onSubmitted: () => widget.onReply(null),
-                  ),
-                ),
             ],
           ).paddingOnly(
             top: 16,

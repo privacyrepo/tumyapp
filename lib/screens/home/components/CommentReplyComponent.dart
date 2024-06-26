@@ -10,10 +10,14 @@ import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
 class CommentReplyComponent extends StatefulWidget {
   final String parentId; // Pass the parent comment ID if it's a reply
   final VoidCallback onSubmitted;
+  final FocusNode focusNode; // Add FocusNode
 
-  const CommentReplyComponent(
-      {Key? key, required this.parentId, required this.onSubmitted})
-      : super(key: key);
+  const CommentReplyComponent({
+    Key? key,
+    required this.parentId,
+    required this.onSubmitted,
+    required this.focusNode, // Add FocusNode to constructor
+  }) : super(key: key);
 
   @override
   _CommentReplyComponentState createState() => _CommentReplyComponentState();
@@ -54,49 +58,66 @@ class _CommentReplyComponentState extends State<CommentReplyComponent> {
   }
 
   @override
+  void didUpdateWidget(CommentReplyComponent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.focusNode.hasFocus) {
+      widget.focusNode.requestFocus();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final currentUser = authProvider.currentUser;
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       color: svGetScaffoldColor(),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
-          Row(
-            children: [
-              16.width,
-              currentUser == null
-                  ? CircularProgressIndicator()
-                  : Image.network(
-                      currentUser.avatar,
-                      height: 48,
-                      width: 48,
-                      fit: BoxFit.cover,
-                    ).cornerRadiusWithClipRRect(8),
-              10.width,
-              Expanded(
-                child: AppTextField(
-                  controller: _commentController,
-                  textFieldType: TextFieldType.OTHER,
-                  decoration: InputDecoration(
-                    hintText: 'Write A Comment',
-                    hintStyle: secondaryTextStyle(color: svGetBodyColor()),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                  ),
-                ),
+          currentUser == null || currentUser.avatar.isEmpty
+              ? Icon(Icons.person, size: 48) // Placeholder icon
+              : Image.network(
+                  currentUser.avatar,
+                  height: 48,
+                  width: 48,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    } else {
+                      return CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      );
+                    }
+                  },
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return Icon(Icons.error, size: 48); // Error icon or any other placeholder
+                  },
+                ).cornerRadiusWithClipRRect(8),
+          10.width,
+          Expanded(
+            child: AppTextField(
+              controller: _commentController,
+              focus: widget.focusNode, // Set the FocusNode
+              textFieldType: TextFieldType.OTHER,
+              decoration: InputDecoration(
+                hintText: 'Write A Comment',
+                hintStyle: secondaryTextStyle(color: svGetBodyColor()),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
               ),
-              TextButton(
-                onPressed: _addComment,
-                child: Text(
-                  'Reply',
-                  style: secondaryTextStyle(color: AppColorPrimary),
-                ),
-              ),
-            ],
+            ),
+          ),
+          TextButton(
+            onPressed: _addComment,
+            child: Text(
+              'Reply',
+              style: secondaryTextStyle(color: AppColorPrimary),
+            ),
           ),
         ],
       ),

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
-const AppColorPrimary = Color(0xFF2F65B9);
+// Define the primary orange color
+const AppColorPrimary = Color(0xFFFF9800);
 
-//Section BG / page BG
+// Section BG / page BG
 const AppLayoutBackground = Color(0xFFF4F7F6);
 const AppSectionBackground = Color(0xFFFFFFFF);
 const AppBorderColor = Color(0xFFD9DFEB);
-// Tertiary
 
+// Tertiary
 const BodyWhite = Color(0xFF6F7F92);
 const BodyDark = Color(0xFFF5F5F5);
 const DividerColor = Color(0xFFE1E5EF);
 
+// Dark theme colors
 const appBackgroundColorDark = Color(0xFF121212);
 const cardBackgroundBlackDark = Color(0xFF1F1F1F);
 const color_primary_black = Color(0xFF131d25);

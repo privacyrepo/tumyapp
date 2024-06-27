@@ -6,14 +6,16 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:tumy_app/utils/Colors.dart';
 import 'package:tumy_app/utils/Common.dart';
 import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
-
+import 'package:uuid/uuid.dart';
 class CommentReplyComponent extends StatefulWidget {
+  final String postId;
   final String parentId; // Pass the parent comment ID if it's a reply
   final VoidCallback onSubmitted;
   final FocusNode focusNode; // Add FocusNode
 
   const CommentReplyComponent({
     Key? key,
+    required this.postId,
     required this.parentId,
     required this.onSubmitted,
     required this.focusNode, // Add FocusNode to constructor
@@ -39,11 +41,11 @@ class _CommentReplyComponentState extends State<CommentReplyComponent> {
       // Handle user not being logged in
       return;
     }
-
+    final Uuid uuid = Uuid();
     Comment newComment = Comment(
-      id: '', // Firestore will generate an ID
+      id: uuid.v4(), // Firestore will generate an ID
       content: _commentController.text.trim(),
-      postId: '', // Set the postId accordingly if this is related to a post
+      postId: widget.postId, // Set the postId accordingly if this is related to a post
       authorId: currentUser.id,
       likes: [],
       replies: [],

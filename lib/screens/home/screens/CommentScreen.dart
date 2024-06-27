@@ -10,6 +10,18 @@ import 'package:tumy_app/utils/Common.dart';
 import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
 
 class CommentScreen extends StatefulWidget {
+  final String postId;
+
+  CommentScreen({required this.postId});
+
+  static void launch(BuildContext context, String postId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CommentScreen(postId: postId),
+      ),
+    );
+  }
+
   @override
   _CommentScreenState createState() => _CommentScreenState();
 }
@@ -65,7 +77,7 @@ class _CommentScreenState extends State<CommentScreen> {
         child: Stack(
           children: [
             StreamBuilder<List<Comment>>(
-              stream: _firestoreService.getComments(),
+              stream: _firestoreService.getCommentsByPostId(widget.postId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
@@ -89,6 +101,7 @@ class _CommentScreenState extends State<CommentScreen> {
               left: 0,
               right: 0,
               child: CommentReplyComponent(
+                postId: widget.postId,
                 parentId: activeCommentId ?? '',
                 onSubmitted: () => _setActiveComment(null),
                 focusNode: _focusNode, // Pass the FocusNode

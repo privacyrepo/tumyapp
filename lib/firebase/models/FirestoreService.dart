@@ -82,6 +82,15 @@ class FirestoreService {
     });
   }
 
+  Stream<List<Comment>> getCommentsByPostId(String postId) {
+    return _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Comment.fromFirestore(doc)).toList());
+  }
+
   Future<void> updateComment(
       String commentId, Map<String, dynamic> data) async {
     await _firestore.collection('comments').doc(commentId).update(data);
@@ -311,4 +320,6 @@ class FirestoreService {
 
     return postsQuery.docs.map((doc) => Post.fromFirestore(doc)).toList();
   }
+
+
 }

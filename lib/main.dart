@@ -11,6 +11,7 @@ import 'package:tumy_app/screens/auth/screens/SignInScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'package:tumy_app/firebase/models/DummyData.dart';
 AppStore appStore = AppStore();
 
 void main() async {
@@ -20,7 +21,7 @@ void main() async {
   );
   await initialize();
   appStore.toggleDarkMode(value: false);
-
+  // await addDummyData(5, 5, 15);
   runApp(const MyApp());
 }
 

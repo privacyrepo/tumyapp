@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:tumy_app/models/PostModel.dart';
 import 'package:tumy_app/screens/home/screens/CommentScreen.dart';
 import 'package:tumy_app/utils/Common.dart';
 import 'package:tumy_app/utils/Constants.dart';
+import 'package:tumy_app/firebase/models/FirestoreModels.dart' as firestore_models; // Add this line
 
 class PostComponent extends StatefulWidget {
+  final List<firestore_models.Post> postList; // Pass a list of Post objects
+
+  PostComponent({required this.postList});
+
   @override
   State<PostComponent> createState() => _PostComponentState();
 }
 
 class _PostComponentState extends State<PostComponent> {
-  List<PostModel> postList = getPosts();
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: postList.length,
+      itemCount: widget.postList.length,
       itemBuilder: (context, index) {
+        firestore_models.Post post = widget.postList[index];
+
         return Container(
           padding: EdgeInsets.symmetric(vertical: 16),
           margin: EdgeInsets.symmetric(vertical: 8),
@@ -31,15 +35,17 @@ class _PostComponentState extends State<PostComponent> {
                 children: [
                   Row(
                     children: [
-                      Image.asset(
-                        postList[index].profileImage.validate(),
-                        height: 56,
-                        width: 56,
-                        fit: BoxFit.cover,
-                      ).cornerRadiusWithClipRRect(AppCommonRadius),
+                      // Assuming profile image is the first image in images list
+                      post.images.isNotEmpty
+                          ? Image.network(
+                              post.images[0],
+                              height: 56,
+                              width: 56,
+                              fit: BoxFit.cover,
+                            ).cornerRadiusWithClipRRect(AppCommonRadius)
+                          : Icon(Icons.person, size: 56), // Placeholder icon
                       12.width,
-                      Text(postList[index].name.validate(),
-                          style: boldTextStyle()),
+                      Text(post.title.validate(), style: boldTextStyle()),
                       4.width,
                       Image.asset('images/tumy/icons/ic_TickSquare.png',
                           height: 14, width: 14, fit: BoxFit.cover),
@@ -47,7 +53,7 @@ class _PostComponentState extends State<PostComponent> {
                   ).paddingSymmetric(horizontal: 16),
                   Row(
                     children: [
-                      Text('${postList[index].time.validate()} ago',
+                      Text(timeAgo(post.createdAt),
                           style: secondaryTextStyle(
                               color: svGetBodyColor(), size: 12)),
                       IconButton(
@@ -57,21 +63,23 @@ class _PostComponentState extends State<PostComponent> {
                 ],
               ),
               16.height,
-              postList[index].description.validate().isNotEmpty
+              post.description.validate().isNotEmpty
                   ? svRobotoText(
-                          text: postList[index].description.validate(),
+                          text: post.description.validate(),
                           textAlign: TextAlign.start)
                       .paddingSymmetric(horizontal: 16)
                   : Offstage(),
-              postList[index].description.validate().isNotEmpty
+              post.description.validate().isNotEmpty
                   ? 16.height
                   : Offstage(),
-              Image.asset(
-                postList[index].postImage.validate(),
-                height: 300,
-                width: context.width() - 32,
-                fit: BoxFit.cover,
-              ).cornerRadiusWithClipRRect(AppCommonRadius).center(),
+              post.images.isNotEmpty
+                  ? Image.network(
+                      post.images[0], // Assuming the first image is the post image
+                      height: 300,
+                      width: context.width() - 32,
+                      fit: BoxFit.cover,
+                    ).cornerRadiusWithClipRRect(AppCommonRadius).center()
+                  : Offstage(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -84,12 +92,12 @@ class _PostComponentState extends State<PostComponent> {
                         fit: BoxFit.cover,
                         color: context.iconColor,
                       ).onTap(() {
-                        CommentScreen().launch(context);
+                        CommentScreen(postId: post.id,).launch(context);
                       },
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent),
                       IconButton(
-                        icon: postList[index].like.validate()
+                        icon: post.likes.contains('currentUserId') // Check if the current user liked the post
                             ? Image.asset(
                                 'images/tumy/icons/ic_HeartFilled.png',
                                 height: 20,
@@ -103,9 +111,13 @@ class _PostComponentState extends State<PostComponent> {
                                 color: context.iconColor,
                               ),
                         onPressed: () {
-                          postList[index].like =
-                              !postList[index].like.validate();
-                          setState(() {});
+                          setState(() {
+                            if (post.likes.contains('currentUserId')) {
+                              post.likes.remove('currentUserId');
+                            } else {
+                              post.likes.add('currentUserId');
+                            }
+                          });
                         },
                       ),
                       Image.asset(
@@ -121,7 +133,7 @@ class _PostComponentState extends State<PostComponent> {
                           highlightColor: Colors.transparent),
                     ],
                   ),
-                  Text('${postList[index].commentCount.validate()} comments',
+                  Text('${post.comments.length} comments',
                       style: secondaryTextStyle(color: svGetBodyColor())),
                 ],
               ).paddingSymmetric(horizontal: 16),
@@ -201,5 +213,31 @@ class _PostComponentState extends State<PostComponent> {
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
     );
+  }
+
+  String timeAgo(DateTime date) {
+    Duration difference = DateTime.now().difference(date);
+
+    if (difference.inDays > 8) {
+      return '${difference.inDays ~/ 7} weeks';
+    } else if ((difference.inDays / 7).floor() >= 1) {
+      return '${(difference.inDays / 7).floor()} week';
+    } else if (difference.inDays >= 2) {
+      return '${difference.inDays} days';
+    } else if (difference.inDays >= 1) {
+      return '1 day';
+    } else if (difference.inHours >= 2) {
+      return '${difference.inHours} hours';
+    } else if (difference.inHours >= 1) {
+      return '1 hour';
+    } else if (difference.inMinutes >= 2) {
+      return '${difference.inMinutes} minutes';
+    } else if (difference.inMinutes >= 1) {
+      return '1 minute';
+    } else if (difference.inSeconds >= 3) {
+      return '${difference.inSeconds} seconds';
+    } else {
+      return 'just now';
+    }
   }
 }

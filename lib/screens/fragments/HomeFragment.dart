@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:tumy_app/screens/home/components/HomeDrawerComponent.dart';
 import 'package:tumy_app/screens/home/components/PostComponent.dart';
 import 'package:tumy_app/screens/home/components/StoryComponent.dart';
 import 'package:tumy_app/utils/Common.dart';
+import 'package:tumy_app/firebase/models/FirestoreModels.dart' hide Image; // Assuming the Post model is in models directory
 
 class HomeFragment extends StatefulWidget {
   @override
@@ -16,6 +18,7 @@ class _HomeFragmentState extends State<HomeFragment> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   File? image;
+  List<Post> postList = []; // Initialize post list
 
   @override
   void initState() {
@@ -23,8 +26,46 @@ class _HomeFragmentState extends State<HomeFragment> {
     afterBuildCreated(() {
       setStatusBarColor(svGetScaffoldColor());
     });
+    // Example of adding some mock data to the postList
+    postList = [
+      Post(
+        id: '1',
+        title: 'Post Title 1',
+        description: 'This is the description for post 1',
+        authorId: 'author1',
+        comments: ['comment1', 'comment2'],
+        likes: ['user1', 'user2'],
+        images: ['https://picsum.photos/id/237/200/300'],
+        storyImages: [],
+        video: '',
+        hashtags: ['#flutter', '#dart'],
+        createdAt: DateTime.now().subtract(Duration(days: 1)),
+        updatedAt: DateTime.now(),
+      ),
+      Post(
+        id: '2',
+        title: 'Post Title 2',
+        description: 'This is the description for post 2',
+        authorId: 'author2',
+        comments: ['comment3', 'comment4'],
+        likes: ['user3', 'user4'],
+        images: ['https://picsum.photos/seed/picsum/200/300'],
+        storyImages: [],
+        video: '',
+        hashtags: ['#flutter', '#dart'],
+        createdAt: DateTime.now().subtract(Duration(days: 2)),
+        updatedAt: DateTime.now(),
+      ),
+    ];
   }
-
+  Stream<List<Post>> fetchPosts() {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +112,19 @@ class _HomeFragmentState extends State<HomeFragment> {
             16.height,
             StoryComponent(),
             16.height,
-            PostComponent(),
+            StreamBuilder<List<Post>>(
+              stream: fetchPosts(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                List<Post> postList = snapshot.data!;
+                return PostComponent(postList: postList); // Pass the postList to PostComponent
+              },
+            ),
             16.height,
           ],
         ),

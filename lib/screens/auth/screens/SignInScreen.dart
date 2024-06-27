@@ -55,22 +55,16 @@ class _SignInScreenState extends State<SignInScreen> {
       backgroundColor: svGetScaffoldColor(),
       body: Column(
         children: [
-          SizedBox(height: context.statusBarHeight + 50),
+          SizedBox(height: context.statusBarHeight),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('images/tumy/svAppIcon.png',
-                  height: 40, width: 40, fit: BoxFit.cover),
-              8.width,
-              Text(svAppName,
-                  style: primaryTextStyle(
-                      color: AppColorPrimary,
-                      size: 28,
-                      weight: FontWeight.w500,
-                      fontFamily: svFontRoboto)),
+              Image.asset('images/tumy/logo.png',
+                  height: 128, width: 128, fit: BoxFit.cover),
+
             ],
           ),
-          40.height,
+          
           svHeaderContainer(
             context: context,
             child: Row(

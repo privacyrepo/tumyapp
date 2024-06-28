@@ -17,6 +17,15 @@ class AuthProvider with ChangeNotifier {
 
   AuthProvider() {
     _loadUserFromPreferences();
+    _auth.authStateChanges().listen((firebase_auth.User? firebaseUser) {
+      if (firebaseUser != null) {
+        _loadUserFromFirestore(firebaseUser.uid);
+      } else {
+        _currentUser = null;
+        _isLoggedIn = false;
+        notifyListeners();
+      }
+    });
   }
 
   String? getCurrentUserId() {
@@ -25,14 +34,11 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> login(String email, String password) async {
     try {
-      firebase_auth.UserCredential userCredential = await _auth
-          .signInWithEmailAndPassword(email: email, password: password);
+      firebase_auth.UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
       firebase_auth.User? firebaseUser = userCredential.user;
 
       if (firebaseUser != null) {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(firebaseUser.uid).get();
-        _currentUser = User.fromFirestore(userDoc);
+        await _loadUserFromFirestore(firebaseUser.uid);
         _isLoggedIn = true;
         _saveUserToPreferences();
         notifyListeners();
@@ -45,19 +51,18 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signUp(String email, String password) async {
     try {
-      firebase_auth.UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      firebase_auth.UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       firebase_auth.User? firebaseUser = userCredential.user;
-      String name = 'user' + firebaseUser!.uid.substring(0, 5);
+      if (firebaseUser == null) return;
+
+      String name = 'user' + firebaseUser.uid.substring(0, 5);
       _currentUser = User(
         id: firebaseUser.uid,
         email: email,
-        password:
-            password, // Note: It's generally not a good idea to store passwords in plaintext
+        password: password, // Avoid storing plain text passwords
         name: name,
         bio: '',
-        avatar:
-            'https://img.icons8.com/?size=100&id=492ILERveW8G&format=png&color=000000',
+        avatar: 'https://img.icons8.com/?size=100&id=492ILERveW8G&format=png&color=000000',
         role: 'USER',
         followers: [],
         following: [],
@@ -72,10 +77,8 @@ class AuthProvider with ChangeNotifier {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      await _firestore
-          .collection('users')
-          .doc(firebaseUser.uid)
-          .set(_currentUser!.toFirestore());
+
+      await _firestore.collection('users').doc(firebaseUser.uid).set(_currentUser!.toFirestore());
       _isLoggedIn = true;
       _saveUserToPreferences();
       notifyListeners();
@@ -93,10 +96,26 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _loadUserFromFirestore(String uid) async {
+    try {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+      if (userDoc.exists) {
+        _currentUser = User.fromFirestore(userDoc);
+        _isLoggedIn = true;
+        _saveUserToPreferences();
+        notifyListeners();
+      }
+    } catch (e) {
+      print("Failed to load user from Firestore: $e");
+    }
+  }
+
   Future<void> _saveUserToPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('user', jsonEncode(_currentUser!.toMap()));
-    prefs.setBool('isLoggedIn', _isLoggedIn);
+    if (_currentUser != null) {
+      prefs.setString('user', jsonEncode(_currentUser!.toMap()));
+      prefs.setBool('isLoggedIn', _isLoggedIn);
+    }
   }
 
   Future<void> _loadUserFromPreferences() async {

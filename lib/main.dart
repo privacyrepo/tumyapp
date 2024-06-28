@@ -12,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'package:tumy_app/firebase/models/DummyData.dart';
+
 AppStore appStore = AppStore();
 
 void main() async {
@@ -43,11 +44,15 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: appStore.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: Consumer<AuthProvider>(
-            builder: (context, auth, _) {
-              return auth.isLoggedIn ? DashboardScreen() : SignInScreen();
-            },
-          ),
+          initialRoute: '/',
+          routes: {
+            '/': (context) => Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                return auth.isLoggedIn ? DashboardScreen() : SignInScreen();
+              },
+            ),
+            '/login': (context) => SignInScreen(),
+          },
         ),
       ),
     );

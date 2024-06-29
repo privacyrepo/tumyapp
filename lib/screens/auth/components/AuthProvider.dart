@@ -23,6 +23,7 @@ class AuthProvider with ChangeNotifier {
       } else {
         _currentUser = null;
         _isLoggedIn = false;
+        _removeUserFromPreferences();
         notifyListeners();
       }
     });
@@ -59,7 +60,8 @@ class AuthProvider with ChangeNotifier {
       _currentUser = User(
         id: firebaseUser.uid,
         email: email,
-        password: password, // Avoid storing plain text passwords
+        // Note: Avoid storing plain text passwords
+        password: password, 
         name: name,
         bio: '',
         avatar: 'https://img.icons8.com/?size=100&id=492ILERveW8G&format=png&color=000000',

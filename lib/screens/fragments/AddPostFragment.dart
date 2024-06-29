@@ -1,10 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:tumy_app/main.dart';
 import 'package:tumy_app/screens/addPost/components/PostOptionsComponent.dart';
 import 'package:tumy_app/screens/addPost/components/PostTextComponent.dart';
 import 'package:tumy_app/utils/Colors.dart';
 import 'package:tumy_app/utils/Common.dart';
+import 'package:tumy_app/firebase/models/FirestoreService.dart';
+import 'package:tumy_app/firebase/models/FirestoreModels.dart' hide Image; 
+import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
+import 'package:uuid/uuid.dart';
 
 class AddPostFragment extends StatefulWidget {
   const AddPostFragment({Key? key}) : super(key: key);
@@ -14,7 +21,12 @@ class AddPostFragment extends StatefulWidget {
 }
 
 class _AddPostFragmentState extends State<AddPostFragment> {
-  String image = '';
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final FirestoreService _firestoreService = FirestoreService();
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  final Uuid uuid = Uuid();
+  List<String> _imageUrls = [];
 
   @override
   void initState() {
@@ -28,7 +40,63 @@ class _AddPostFragmentState extends State<AddPostFragment> {
   void dispose() {
     setStatusBarColor(
         appStore.isDarkMode ? appBackgroundColorDark : AppLayoutBackground);
+    _titleController.dispose();
+    _descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _createPost() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final currentUser = authProvider.currentUser;
+
+    if (currentUser == null) {
+      toast('Please log in to create a post');
+      return;
+    }
+
+    if (_titleController.text.trim().isEmpty || _descriptionController.text.trim().isEmpty) {
+      toast('Title and description cannot be empty');
+      return;
+    }
+
+    String postId = uuid.v4();
+    Post newPost = Post(
+      id: postId,
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
+      authorId: currentUser.id,
+      images: _imageUrls,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    await _firestoreService.createPost(newPost);
+    toast('Post created successfully');
+    Navigator.of(context).pop(); // Close the screen after posting
+  }
+
+  Future<void> _uploadImages(List<File> imageFiles) async {
+    for (File imageFile in imageFiles) {
+      String fileName = uuid.v4();
+      UploadTask uploadTask =
+          _firebaseStorage.ref().child('post_images/$fileName').putFile(imageFile);
+
+      try {
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+        setState(() {
+          _imageUrls.add(downloadUrl);
+        });
+      } catch (e) {
+        print("Error uploading image: $e");
+        // Handle error as needed
+      }
+    }
+  }
+
+  void _onImagesSelected(List<File> selectedImages) async {
+    await _uploadImages(selectedImages);
   }
 
   @override
@@ -46,9 +114,7 @@ class _AddPostFragmentState extends State<AddPostFragment> {
             shapeBorder: RoundedRectangleBorder(borderRadius: radius(4)),
             text: 'Post',
             textStyle: secondaryTextStyle(color: Colors.white, size: 10),
-            onTap: () {
-              svShowShareBottomSheet(context);
-            },
+            onTap: _createPost,
             elevation: 0,
             color: AppColorPrimary,
             width: 50,
@@ -60,9 +126,14 @@ class _AddPostFragmentState extends State<AddPostFragment> {
         height: context.height(),
         child: Stack(
           children: [
-            PostTextComponent(),
+            PostTextComponent(
+              titleController: _titleController,
+              descriptionController: _descriptionController,
+            ),
             Positioned(
-              child: PostOptionsComponent(),
+              child: PostOptionsComponent(
+                onImagesSelected: _onImagesSelected,
+              ),
               bottom: 0,
             ),
           ],

@@ -27,36 +27,6 @@ class _HomeFragmentState extends State<HomeFragment> {
       setStatusBarColor(svGetScaffoldColor());
     });
     // Example of adding some mock data to the postList
-    postList = [
-      Post(
-        id: '1',
-        title: 'Post Title 1',
-        description: 'This is the description for post 1',
-        authorId: 'author1',
-        comments: ['comment1', 'comment2'],
-        likes: ['user1', 'user2'],
-        images: ['https://picsum.photos/id/237/200/300'],
-        storyImages: [],
-        video: '',
-        hashtags: ['#flutter', '#dart'],
-        createdAt: DateTime.now().subtract(Duration(days: 1)),
-        updatedAt: DateTime.now(),
-      ),
-      Post(
-        id: '2',
-        title: 'Post Title 2',
-        description: 'This is the description for post 2',
-        authorId: 'author2',
-        comments: ['comment3', 'comment4'],
-        likes: ['user3', 'user4'],
-        images: ['https://picsum.photos/seed/picsum/200/300'],
-        storyImages: [],
-        video: '',
-        hashtags: ['#flutter', '#dart'],
-        createdAt: DateTime.now().subtract(Duration(days: 2)),
-        updatedAt: DateTime.now(),
-      ),
-    ];
   }
   Stream<List<Post>> fetchPosts() {
     return FirebaseFirestore.instance

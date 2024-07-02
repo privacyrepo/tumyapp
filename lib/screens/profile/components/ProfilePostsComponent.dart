@@ -72,7 +72,7 @@ class _ProfilePostsComponentState extends State<ProfilePostsComponent> {
                       setState(() {});
                     },
                     child: Text(
-                      'Mentions',
+                      'Saved',
                       style: TextStyle(
                         color: AppColorPrimary,
                         fontSize: 14,

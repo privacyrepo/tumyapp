@@ -18,13 +18,15 @@ class GroupProfileScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         actions: [
+
+          
           IconButton(onPressed: () {}, icon: Icon(Icons.more_horiz)),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ProfileHeaderComponent(),
+            ProfileHeaderComponent(null),
             16.height,
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

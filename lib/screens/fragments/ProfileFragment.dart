@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:provider/provider.dart'; // Import Provider
 import 'package:tumy_app/main.dart';
+import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
 import 'package:tumy_app/screens/home/components/StoryComponent.dart';
 import 'package:tumy_app/screens/profile/components/ProfileHeaderComponent.dart';
 import 'package:tumy_app/screens/profile/components/ProfilePostsComponent.dart';
 import 'package:tumy_app/utils/Common.dart';
 import 'package:tumy_app/utils/Constants.dart';
+import 'package:tumy_app/utils/Colors.dart';
 
-import '../../utils/Colors.dart';
 
 class ProfileFragment extends StatefulWidget {
   const ProfileFragment({Key? key}) : super(key: key);
@@ -18,6 +20,8 @@ class ProfileFragment extends StatefulWidget {
 }
 
 class _ProfileFragmentState extends State<ProfileFragment> {
+  AuthProvider? authProvider; // Declare AuthProvider variable
+
   @override
   void initState() {
     setStatusBarColor(Colors.transparent);
@@ -26,6 +30,8 @@ class _ProfileFragmentState extends State<ProfileFragment> {
 
   @override
   Widget build(BuildContext context) {
+    authProvider = Provider.of<AuthProvider>(context); // Initialize authProvider
+
     return Observer(
       builder: (_) => Scaffold(
         backgroundColor: svGetScaffoldColor(),
@@ -43,24 +49,27 @@ class _ProfileFragmentState extends State<ProfileFragment> {
               value: appStore.isDarkMode,
               activeColor: AppColorPrimary,
             ),
-            //IconButton(onPressed: () {}, icon: Icon(Icons.more_horiz)),
           ],
         ),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              ProfileHeaderComponent(),
+              ProfileHeaderComponent(authProvider?.currentUser?.avatar), // Use ProfileHeaderComponent to display user info
               16.height,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Manding boss', style: boldTextStyle(size: 20)),
+                  Text(authProvider?.currentUser?.name ?? '', style: boldTextStyle(size: 20)), // Use user's name
                   4.width,
-                  Image.asset('images/tumy/icons/ic_TickSquare.png',
-                      height: 14, width: 14, fit: BoxFit.cover),
+                  Image.network(
+                    authProvider?.currentUser?.avatar ?? '', // Use user's avatar URL
+                    height: 14,
+                    width: 14,
+                    fit: BoxFit.cover,
+                  ),
                 ],
               ),
-              Text('@splatterui',
+              Text(authProvider?.currentUser?.email ?? '', // Use user's email
                   style: secondaryTextStyle(color: svGetBodyColor())),
               24.height,
               AppButton(
@@ -81,7 +90,7 @@ class _ProfileFragmentState extends State<ProfileFragment> {
                           style: secondaryTextStyle(
                               color: svGetBodyColor(), size: 12)),
                       4.height,
-                      Text('1,1286', style: boldTextStyle(size: 18)),
+                      Text(authProvider?.currentUser?.following.length.toString() ?? '', style: boldTextStyle(size: 18)), // Replace with user's posts count
                     ],
                   ),
                   Column(
@@ -90,18 +99,10 @@ class _ProfileFragmentState extends State<ProfileFragment> {
                           style: secondaryTextStyle(
                               color: svGetBodyColor(), size: 12)),
                       4.height,
-                      Text('127k', style: boldTextStyle(size: 18)),
+                      Text(authProvider?.currentUser?.followers.length.toString() ?? '', style: boldTextStyle(size: 18)), // Replace with user's followers count
                     ],
                   ),
-                  Column(
-                    children: [
-                      Text('Views',
-                          style: secondaryTextStyle(
-                              color: svGetBodyColor(), size: 12)),
-                      4.height,
-                      Text('1156m', style: boldTextStyle(size: 18)),
-                    ],
-                  )
+
                 ],
               ),
               16.height,

@@ -3,7 +3,9 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:tumy_app/utils/Constants.dart';
 
 class ProfileHeaderComponent extends StatelessWidget {
-  const ProfileHeaderComponent({Key? key}) : super(key: key);
+  const ProfileHeaderComponent(String? avatar, {Key? key}) : super(key: key);
+  
+  String? get avatar => null;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class ProfileHeaderComponent extends StatelessWidget {
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.white, width: 2),
                       borderRadius: radius(18)),
-                  child: Image.asset('images/tumy/faces/face_5.png',
+                  child: Image.asset(avatar!,
                           height: 88, width: 88, fit: BoxFit.cover)
                       .cornerRadiusWithClipRRect(AppCommonRadius),
                 ),

@@ -91,7 +91,7 @@ class FirestoreService {
     DocumentReference postRef = _firestore.collection('posts').doc(comment.postId);
 
     // Add the comment
-    batch.set(commentRef, comment.toMap());
+    batch.set(commentRef, comment.toFirestore());
 
     // Update the post's comments array and count
     batch.update(postRef, {

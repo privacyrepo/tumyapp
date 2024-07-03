@@ -94,13 +94,14 @@ class _HomeDrawerComponentState extends State<HomeDrawerComponent> {
                             if (selectedIndex == options.length - 1) {
                               await authProvider.logout();
                               Navigator.of(context).pushReplacementNamed('/login');
-                            } else if (selectedIndex == 4) {
-                              finish(context);
-                              ForumScreen().launch(context);
-                            } else if (selectedIndex == 2) {
-                              finish(context);
-                              GroupProfileScreen().launch(context);
-                            }
+                              }
+                            // } else if (selectedIndex == 4) {
+                            //   finish(context);
+                            //   ForumScreen().launch(context);
+                            // } else if (selectedIndex == 2) {
+                            //   finish(context);
+                            //   GroupProfileScreen().launch(context);
+                            // }
                           },
                         );
                       }).toList(),

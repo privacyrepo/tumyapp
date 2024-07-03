@@ -81,7 +81,34 @@ class FirestoreService {
       }).toList();
     });
   }
+  Future<void> addCommentAndUpdatePost(Comment comment) async {
+    WriteBatch batch = _firestore.batch();
 
+    // Reference to the new comment document
+    DocumentReference commentRef = _firestore.collection('comments').doc(comment.id);
+
+    // Reference to the post document
+    DocumentReference postRef = _firestore.collection('posts').doc(comment.postId);
+
+    // Add the comment
+    batch.set(commentRef, comment.toMap());
+
+    // Update the post's comments array and count
+    batch.update(postRef, {
+      'comments': FieldValue.arrayUnion([comment.id]),
+    });
+
+    // If the comment is a reply, update the parent comment's replies array
+    if (comment.parentId!.isNotEmpty) {
+      DocumentReference parentCommentRef = _firestore.collection('comments').doc(comment.parentId);
+      batch.update(parentCommentRef, {
+        'replies': FieldValue.arrayUnion([comment.id]),
+      });
+    }
+
+    // Commit the batch
+    await batch.commit();
+  }
   Stream<List<Comment>> getCommentsByPostId(String postId) {
     return _firestore
         .collection('comments')

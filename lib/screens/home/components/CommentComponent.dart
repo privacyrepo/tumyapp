@@ -84,7 +84,8 @@ class _CommentComponentState extends State<CommentComponent> {
                               return child;
                             } else {
                               return CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
                                     ? loadingProgress.cumulativeBytesLoaded /
                                         (loadingProgress.expectedTotalBytes ??
                                             1)
@@ -95,11 +96,13 @@ class _CommentComponentState extends State<CommentComponent> {
                           errorBuilder: (BuildContext context, Object error,
                               StackTrace? stackTrace) {
                             return Icon(Icons.error,
-                                size: 48); // Error icon or any other placeholder
+                                size:
+                                    48); // Error icon or any other placeholder
                           },
                         ).cornerRadiusWithClipRRect(8)
                       else
-                        Icon(Icons.person, size: 48).cornerRadiusWithClipRRect(8),
+                        Icon(Icons.person, size: 48)
+                            .cornerRadiusWithClipRRect(8),
                       16.width,
                       Text(authorUser!.name.validate(),
                           style: boldTextStyle(size: 14)),
@@ -135,7 +138,8 @@ class _CommentComponentState extends State<CommentComponent> {
                   GestureDetector(
                     onTap: _toggleLike,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
                         borderRadius: radius(4),
                         color: svGetScaffoldColor(),
@@ -169,7 +173,8 @@ class _CommentComponentState extends State<CommentComponent> {
                       widget.onReply(widget.comment.id);
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
                         borderRadius: radius(4),
                         color: svGetScaffoldColor(),
@@ -182,7 +187,10 @@ class _CommentComponentState extends State<CommentComponent> {
             ],
           ).paddingOnly(
             top: 16,
-            left: widget.comment.parentId != '' ? 70 : 16,
+            left: (widget.comment.parentId != '' &&
+                    widget.comment.parentId != null)
+                ? 70
+                : 16,
             right: 16,
             bottom: 16,
           );

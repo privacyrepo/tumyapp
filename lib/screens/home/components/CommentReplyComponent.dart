@@ -54,7 +54,7 @@ class _CommentReplyComponentState extends State<CommentReplyComponent> {
       updatedAt: DateTime.now(),
     );
 
-    await _firestoreService.createComment(newComment);
+    await _firestoreService.addCommentAndUpdatePost(newComment);
     _commentController.clear();
     widget.onSubmitted(); // Call the callback to reset the active comment
   }

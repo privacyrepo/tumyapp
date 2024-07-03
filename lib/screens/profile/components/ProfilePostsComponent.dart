@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:tumy_app/utils/Colors.dart';
 import 'package:tumy_app/utils/Constants.dart';
+import 'package:tumy_app/firebase/models/FirestoreModels.dart' hide Image;
 
 class ProfilePostsComponent extends StatefulWidget {
-  const ProfilePostsComponent({Key? key}) : super(key: key);
+  final User user; // Accept a user object
+
+  ProfilePostsComponent({Key? key, required this.user}) : super(key: key);
 
   @override
   State<ProfilePostsComponent> createState() => _ProfilePostsComponentState();

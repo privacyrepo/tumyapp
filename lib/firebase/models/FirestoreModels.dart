@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// User Model
+
 class User {
   final String id;
   final String email;
@@ -19,6 +19,8 @@ class User {
   final List<String> referrals;
   final List<String> referredUsers;
   final List<String> pregnancyProgress;
+  final List<String> likes; // Add likes list
+  final List<String> posts; // Add posts list
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -40,6 +42,8 @@ class User {
     this.referrals = const [],
     this.referredUsers = const [],
     this.pregnancyProgress = const [],
+    this.likes = const [], // Initialize likes
+    this.posts = const [], // Initialize posts
     required this.createdAt,
     required this.updatedAt,
   });
@@ -64,6 +68,8 @@ class User {
       referrals: List<String>.from(data['referrals'] ?? []),
       referredUsers: List<String>.from(data['referredUsers'] ?? []),
       pregnancyProgress: List<String>.from(data['pregnancyProgress'] ?? []),
+      likes: List<String>.from(data['likes'] ?? []), // Add likes
+      posts: List<String>.from(data['posts'] ?? []), // Add posts
       createdAt: data['createdAt'] != null
           ? (data['createdAt'] as Timestamp).toDate()
           : DateTime.now(),
@@ -91,6 +97,8 @@ class User {
       'referrals': referrals,
       'referredUsers': referredUsers,
       'pregnancyProgress': pregnancyProgress,
+      'likes': likes, // Add likes
+      'posts': posts, // Add posts
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -115,8 +123,11 @@ class User {
       'referrals': referrals,
       'referredUsers': referredUsers,
       'pregnancyProgress': pregnancyProgress,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'likes': likes, // Add likes
+      'posts': posts, // Add posts
+     'createdAt': Timestamp.fromDate(createdAt),
+
+      'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
@@ -139,11 +150,14 @@ class User {
       referrals: List<String>.from(map['referrals'] ?? []),
       referredUsers: List<String>.from(map['referredUsers'] ?? []),
       pregnancyProgress: List<String>.from(map['pregnancyProgress'] ?? []),
+      likes: List<String>.from(map['likes'] ?? []), // Add likes
+      posts: List<String>.from(map['posts'] ?? []), // Add posts
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
     );
   }
 }
+
 
 // Post Model
 class Post {
@@ -231,8 +245,9 @@ class Post {
       'storyImages': storyImages,
       'video': video,
       'hashtags': hashtags,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
+      'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
@@ -320,8 +335,8 @@ class Comment {
       'likes': likes,
       'replies': replies,
       'parentId': parentId,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
@@ -382,7 +397,8 @@ class Like {
       'userId': userId,
       'postId': postId,
       'commentId': commentId,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -434,7 +450,8 @@ class Follower {
       'id': id,
       'followerId': followerId,
       'followingId': followingId,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -490,7 +507,8 @@ class Message {
       'content': content,
       'senderId': senderId,
       'receiverId': receiverId,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -542,7 +560,8 @@ class Notification {
       'id': id,
       'content': content,
       'userId': userId,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -618,7 +637,8 @@ class Payment {
       'stripeId': stripeId,
       'description': description,
       'metadata': metadata,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -684,7 +704,8 @@ class Affiliate {
       'referralCode': referralCode,
       'commission': commission,
       'referredUsers': referredUsers,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -742,7 +763,8 @@ class SavedPost {
       'userId': userId,
       'postId': postId,
       'category': category,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -799,7 +821,8 @@ class PregnancyProgress {
       'userId': userId,
       'week': week,
       'details': details,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 
@@ -851,7 +874,8 @@ class Image {
       'id': id,
       'url': url,
       'postId': postId,
-      'createdAt': createdAt.toIso8601String(),
+     'createdAt': Timestamp.fromDate(createdAt),
+
     };
   }
 

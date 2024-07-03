@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:provider/provider.dart'; // Import Provider
+import 'package:provider/provider.dart';
 import 'package:tumy_app/main.dart';
 import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
 import 'package:tumy_app/screens/home/components/StoryComponent.dart';
 import 'package:tumy_app/screens/profile/components/ProfileHeaderComponent.dart';
 import 'package:tumy_app/screens/profile/components/ProfilePostsComponent.dart';
+import 'package:tumy_app/screens/profile/screens/ProfilePage.dart'; // Import ProfilePage
 import 'package:tumy_app/utils/Common.dart';
 import 'package:tumy_app/utils/Constants.dart';
 import 'package:tumy_app/utils/Colors.dart';
-
 
 class ProfileFragment extends StatefulWidget {
   const ProfileFragment({Key? key}) : super(key: key);
@@ -20,7 +20,7 @@ class ProfileFragment extends StatefulWidget {
 }
 
 class _ProfileFragmentState extends State<ProfileFragment> {
-  AuthProvider? authProvider; // Declare AuthProvider variable
+  AuthProvider? authProvider;
 
   @override
   void initState() {
@@ -30,7 +30,22 @@ class _ProfileFragmentState extends State<ProfileFragment> {
 
   @override
   Widget build(BuildContext context) {
-    authProvider = Provider.of<AuthProvider>(context); // Initialize authProvider
+    authProvider = Provider.of<AuthProvider>(context);
+
+    // Debug prints to check the values
+    print('Current user: ${authProvider?.currentUser}');
+    print('Current user avatar: ${authProvider?.currentUser?.avatar}');
+    print('Current user name: ${authProvider?.currentUser?.name}');
+    print('Current user email: ${authProvider?.currentUser?.email}');
+    print('Current user posts: ${authProvider?.currentUser?.posts}');
+    print('Current user followers: ${authProvider?.currentUser?.followers}');
+
+    if (authProvider?.currentUser == null) {
+      // Handle the null case here
+      return Center(
+        child: Text('User data is not available'),
+      );
+    }
 
     return Observer(
       builder: (_) => Scaffold(
@@ -54,23 +69,37 @@ class _ProfileFragmentState extends State<ProfileFragment> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              ProfileHeaderComponent(authProvider?.currentUser?.avatar), // Use ProfileHeaderComponent to display user info
+              ProfileHeaderComponent(authProvider?.currentUser?.avatar ?? ''), // Pass current user's avatar
               16.height,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(authProvider?.currentUser?.name ?? '', style: boldTextStyle(size: 20)), // Use user's name
+                  Text(authProvider?.currentUser?.name ?? '', style: boldTextStyle(size: 20)), // Use current user's name
                   4.width,
-                  Image.network(
-                    authProvider?.currentUser?.avatar ?? '', // Use user's avatar URL
-                    height: 14,
-                    width: 14,
-                    fit: BoxFit.cover,
+                  GestureDetector(
+                    onTap: () {
+                      if (authProvider?.currentUser != null) {
+                        // Navigate to ProfilePage of the current user
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfilePage(user: authProvider!.currentUser!),
+                          ),
+                        );
+                      } else {
+                        print('Current user is null');
+                      }
+                    },
+                    child: Image.network(
+                      authProvider?.currentUser?.avatar ?? '', // Use current user's avatar URL
+                      height: 14,
+                      width: 14,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ],
               ),
-              Text(authProvider?.currentUser?.email ?? '', // Use user's email
-                  style: secondaryTextStyle(color: svGetBodyColor())),
+              Text(authProvider?.currentUser?.email ?? '', style: secondaryTextStyle(color: svGetBodyColor())), // Use current user's email
               24.height,
               AppButton(
                 shapeBorder: RoundedRectangleBorder(borderRadius: radius(4)),
@@ -86,23 +115,18 @@ class _ProfileFragmentState extends State<ProfileFragment> {
                 children: [
                   Column(
                     children: [
-                      Text('Posts',
-                          style: secondaryTextStyle(
-                              color: svGetBodyColor(), size: 12)),
+                      Text('Posts', style: secondaryTextStyle(color: svGetBodyColor(), size: 12)),
                       4.height,
-                      Text(authProvider?.currentUser?.following.length.toString() ?? '', style: boldTextStyle(size: 18)), // Replace with user's posts count
+                      Text(authProvider?.currentUser?.posts.length.toString() ?? '', style: boldTextStyle(size: 18)), // Replace with current user's posts count
                     ],
                   ),
                   Column(
                     children: [
-                      Text('Followers',
-                          style: secondaryTextStyle(
-                              color: svGetBodyColor(), size: 12)),
+                      Text('Followers', style: secondaryTextStyle(color: svGetBodyColor(), size: 12)),
                       4.height,
-                      Text(authProvider?.currentUser?.followers.length.toString() ?? '', style: boldTextStyle(size: 18)), // Replace with user's followers count
+                      Text(authProvider?.currentUser?.followers.length.toString() ?? '', style: boldTextStyle(size: 18)), // Replace with current user's followers count
                     ],
                   ),
-
                 ],
               ),
               16.height,
@@ -115,14 +139,13 @@ class _ProfileFragmentState extends State<ProfileFragment> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     16.height,
-                    Text('Your Stories', style: boldTextStyle(size: 14))
-                        .paddingSymmetric(horizontal: 16),
+                    Text('Your Stories', style: boldTextStyle(size: 14)).paddingSymmetric(horizontal: 16),
                     StoryComponent(),
                   ],
                 ),
               ),
               16.height,
-              ProfilePostsComponent(),
+              ProfilePostsComponent(user: authProvider!.currentUser!), // Pass current user's ID to fetch posts
               16.height,
             ],
           ),

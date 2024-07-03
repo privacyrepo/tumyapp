@@ -12,12 +12,12 @@ List<DrawerModel> getDrawerOptions() {
       DrawerModel(image: 'images/tumy/icons/ic_Profile.png', title: 'Profile'));
   list.add(
       DrawerModel(image: 'images/tumy/icons/ic_2User.png', title: 'Friends'));
-  list.add(
-      DrawerModel(image: 'images/tumy/icons/ic_3User.png', title: 'Groups'));
-  list.add(
-      DrawerModel(image: 'images/tumy/icons/ic_Image.png', title: 'Gallery'));
-  list.add(
-      DrawerModel(image: 'images/tumy/icons/ic_Document.png', title: 'Forums'));
+  // list.add(
+  //     DrawerModel(image: 'images/tumy/icons/ic_3User.png', title: 'Groups'));
+  // list.add(
+  //     DrawerModel(image: 'images/tumy/icons/ic_Image.png', title: 'Gallery'));
+  // list.add(
+  //     DrawerModel(image: 'images/tumy/icons/ic_Document.png', title: 'Forums'));
   list.add(
       DrawerModel(image: 'images/tumy/icons/ic_Send.png', title: 'Share App'));
   list.add(

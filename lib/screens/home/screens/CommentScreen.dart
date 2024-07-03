@@ -50,9 +50,11 @@ class _CommentScreenState extends State<CommentScreen> {
     List<Comment> sortedComments = _sortComments(comments);
 
     for (var comment in sortedComments.where((c) =>
-        c.parentId == parentId ||
-        (c.parentId == null && parentId == null) ||
-        (c.parentId == '' && parentId == null))) {
+       c.parentId == parentId || 
+      (c.parentId == '' && parentId == null) || 
+      (c.parentId == null && parentId == '') || 
+      (c.parentId == null && parentId == null) || 
+      (c.parentId == '' && parentId == '')))  {
       commentTree.add(CommentComponent(
         comment: comment,
         onReply: _setActiveComment,
@@ -74,38 +76,35 @@ class _CommentScreenState extends State<CommentScreen> {
         onTap: () {
           _focusNode.unfocus(); // Unfocus when tapping outside
         },
-        child: Stack(
+        child: Column(
           children: [
-            StreamBuilder<List<Comment>>(
-              stream: _firestoreService.getCommentsByPostId(widget.postId),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                List<Comment> commentList = snapshot.data!;
-                List<Widget> commentTree = _buildCommentTree(commentList, null);
+            Expanded(
+              child: StreamBuilder<List<Comment>>(
+                stream: _firestoreService.getCommentsByPostId(widget.postId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  List<Comment> commentList = snapshot.data!;
+                  List<Widget> commentTree = _buildCommentTree(commentList, null);
 
-                return SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 80), // Avoid overlap with input box
-                  child: Column(
-                    children: commentTree,
-                  ),
-                );
-              },
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: CommentReplyComponent(
-                postId: widget.postId,
-                parentId: activeCommentId ?? '',
-                onSubmitted: () => _setActiveComment(null),
-                focusNode: _focusNode, // Pass the FocusNode
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.only(bottom: 80), // Avoid overlap with input box
+                    child: Column(
+                      children: commentTree,
+                    ),
+                  );
+                },
               ),
+            ),
+            CommentReplyComponent(
+              postId: widget.postId,
+              parentId: activeCommentId ?? '',
+              onSubmitted: () => _setActiveComment(null),
+              focusNode: _focusNode, // Pass the FocusNode
             ),
           ],
         ),

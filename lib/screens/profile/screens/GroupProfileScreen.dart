@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:tumy_app/screens/auth/components/AuthProvider.dart';
 import 'package:tumy_app/screens/profile/components/ProfileHeaderComponent.dart';
 import 'package:tumy_app/screens/profile/components/ProfilePostsComponent.dart';
 import 'package:tumy_app/utils/Colors.dart';
@@ -175,7 +176,7 @@ class GroupProfileScreen extends StatelessWidget {
               ),
             ),
             16.height,
-            ProfilePostsComponent(),
+            // ProfilePostsComponent(user: AuthProvider.currentUser),
             16.height,
           ],
         ),

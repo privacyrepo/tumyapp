@@ -889,6 +889,40 @@ class Image {
   }
 }
 
+class SearchModel {
+  final String id;
+  final String type; // 'user' or 'post'
+  final String name;
+  final String avatar;
+  final bool isOfficial;
+  final String postImage;
+  final String content;
+
+  SearchModel({
+    required this.id,
+    required this.type,
+    required this.name,
+    required this.avatar,
+    required this.isOfficial,
+    required this.postImage,
+    required this.content,
+  });
+
+  factory SearchModel.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>;
+    return SearchModel(
+      id: doc.id,
+      type: data['type'] ?? '',
+      name: data['name'] ?? '',
+      avatar: data['avatar'] ?? '',
+      isOfficial: data['isOfficial'] ?? false,
+      postImage: data['postImage'] ?? '',
+      content: data['content'] ?? '',
+    );
+  }
+}
+
+
 // Hashtag Model
 class Hashtag {
   final String id;

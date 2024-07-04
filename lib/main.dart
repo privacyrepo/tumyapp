@@ -22,7 +22,7 @@ void main() async {
   );
   await initialize();
   appStore.toggleDarkMode(value: false);
-  // await addDummyData(1, 1, 3);
+  // await addDummyData(10, 10, 30);
   runApp(const MyApp());
 }
 
